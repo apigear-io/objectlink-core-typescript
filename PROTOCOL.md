@@ -58,10 +58,10 @@ To release the resources on the server side the object can also be released.
 name: org.demos
 
 interfaces:
-	- name: Echo
-	  properties:
-	    - name: message
-	      type: string
+  - name: Echo
+	properties:
+	- name: message
+      type: string
 ```
 
 ```js
@@ -82,7 +82,7 @@ subscribe to the object
 receive initial property list, which is automatically send after a link.
 
 ```js
---> [ INIT, 'org.demos.Echo', { message: "hello" } ]
+<-- [ INIT, 'org.demos.Echo', { message: "hello" } ]
 ```
 
 After the init message the object is fully created and all properties have valid values.
@@ -102,7 +102,7 @@ And send to all subscribed clients the changes.
 
 ## Invoke Operations
 
-To invoke remote operations an operation identifier and the operation arguments must be specifified. The reply can only have on value, which can have any complexity.
+To invoke remote operations an operation identifier and the operation arguments must be specified. The reply can only have on value, which can have any complexity.
 
 ```yaml
 name: org.demos
