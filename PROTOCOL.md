@@ -67,7 +67,7 @@ interfaces:
 ```js
 // org.demos.js
 class Echo {
-	message: string = ""
+  message: string = ""
 }
 const echo = new Echo()
 echo.message = "foo"
@@ -108,19 +108,19 @@ To invoke remote operations an operation identifier and the operation arguments 
 name: org.demos
 
 interfaces:
-	- name: Echo
-	  operations:
-	    - name: say
-	  	  params:
-	  	    - name: msg
-	  	      type: string
-	      type: string
+  - name: Echo
+    operations:
+      - name: say
+        params:
+        - name: msg
+          type: string
+        type: string
 ```
 
 ```js
 // org.demos.js
 class Echo {
-	async say(msg: string): string
+  async say(msg: string): string
 }
 
 const echo = new Echo()
@@ -150,18 +150,18 @@ After a client is linked to an object it will start receiving property changes a
 name: org.demos
 
 interfaces:
-	- name: Echo
-	  signals:
-	    - name: shutdown
-	      params:
-	        - name: timeout
-	      	  type: int
+  - name: Echo
+    signals:
+      - name: shutdown
+        params:
+        - name: timeout
+          type: int
 ```
 
 ```js
 // org.demos.js
 class Echo {
-	notifyShutdown(timout: number)	
+  notifyShutdown(timout: number)	
 }
 const echo = new Echo()
 echo.notifyShutdown(10)
@@ -188,7 +188,7 @@ It is possible to provide a resource identifier ID map, which maps numeric IDs t
 
 ```
 {
-	1: "org.demos.Echo/shutdown"
+  1: "org.demos.Echo/shutdown"
 }
 ```
 
