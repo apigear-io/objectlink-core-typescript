@@ -8,9 +8,10 @@ In general a local object will communicate with a remote object and properties w
 
 
 * The protocol shall be simple to implement
-* The protocal shall be be fast and light
+* The protocol shall be be fast and light
 * The protocol shall support all JSON (MsgPack, CBOR) types as payload
 * The protocol shall be implementable using different programming languages and technologies.
+* The protocol also designed for web sockets shall not depend on web sockets
 
 ## Use Case
 
