@@ -1,5 +1,5 @@
 import WebSocket from 'ws'
-import { ObjectLinkClient, IObjectClientHandler } from '../..';
+import { ObjectLinkClient, IObjectClientHandler } from '..';
 import { WebSocketWriter } from './shared';
 
 

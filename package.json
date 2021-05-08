@@ -7,8 +7,8 @@
     "build": "tsc",
     "watch": "nodemon",
     "all": "concurrently --kill-others \"yarn server\" \"yarn app\"",
-    "app": "ts-node src/app.ts",
-    "server": "ts-node src/server.ts"
+    "app": "ts-node src/example/app.ts",
+    "server": "ts-node src/example/server.ts"
   },
   "devDependencies": {
     "@types/ws": "^7.4.2",

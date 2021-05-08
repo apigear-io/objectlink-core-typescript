@@ -1,4 +1,4 @@
-import { IMessageWriter } from "../.."
+import { IMessageWriter } from ".."
 import WebSocket from 'ws'
 
 export class WebSocketWriter implements IMessageWriter {

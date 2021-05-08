@@ -1,5 +1,5 @@
 import WebSocket from 'ws'
-import { IObjectRemoteNotifier, IObjectRemoteAdapter, ObjectLinkRemoteRegistry } from '../../'
+import { IObjectRemoteNotifier, IObjectRemoteAdapter, ObjectLinkRemoteRegistry } from '..'
 import { WebSocketWriter } from './shared';
 
 
