@@ -45,7 +45,7 @@ To use an object the object needs to be linked first. This will populate the loc
 ```
 
 
-To release the resources on the server side the object can also be released.
+To release the resources on the server side the object can also be unlinked.
 
 ```js
 --> [ UNLINK, "org.demos.Echo"]
