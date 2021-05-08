@@ -59,9 +59,9 @@ name: org.demos
 
 interfaces:
   - name: Echo
-	properties:
-	- name: message
-      type: string
+    properties:
+      - name: message
+        type: string
 ```
 
 ```js
