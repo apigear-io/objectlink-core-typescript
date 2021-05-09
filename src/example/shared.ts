@@ -6,8 +6,7 @@ export class WebSocketWriter implements IMessageWriter {
     constructor(ws: WebSocket) {
         this.ws = ws
     }
-    writeMessage(msg: any) {
-        const data = JSON.stringify(msg)
+    writeMessage(data: string) {
         this.ws.send(data)
     }
 }

@@ -1,14 +1,14 @@
 import WebSocket from 'ws'
-import { ObjectLinkClient, IObjectClientHandler } from '..';
+import { ObjectLinkClient, IClientObjectHandler } from '..';
 import { WebSocketWriter } from './shared';
 
 
-class Counter implements IObjectClientHandler {
+class Counter implements IClientObjectHandler {
     count = 0
     client: ObjectLinkClient | undefined    
     async increment() {
         console.log('counter.increment')
-        const result = await this.client?.sendInvoke('demo.Counter/increment', [])
+        const result = await this.client?.invoke('demo.Counter/increment', [])
         console.log('result of increment', result)
     }
 
@@ -45,8 +45,7 @@ function start() {
 
     ws.on('message', (data) => {
         console.log('data', data)
-        const msg = JSON.parse(data.toString())
-        client.handleMessage(msg)
+        client.handleMessage(data.toString())
     })
 }
 

@@ -1,5 +1,6 @@
 import WebSocket from 'ws'
 import { IObjectRemoteNotifier, IObjectRemoteAdapter, ObjectLinkRemoteRegistry } from '..'
+import { ObjectLinkService } from '../lib/service';
 import { WebSocketWriter } from './shared';
 
 
@@ -47,9 +48,9 @@ class CounterAdapter implements IObjectRemoteAdapter {
     }
 }
 
-const manager = new ObjectLinkRemoteRegistry()
+const registry = new ObjectLinkRemoteRegistry()
 const adapter = new CounterAdapter()
-manager.addObject(adapter)
+registry.addObject(adapter)
 
 const wss = new WebSocket.Server({
     port: 8282,
@@ -58,11 +59,9 @@ const wss = new WebSocket.Server({
 wss.on('connection', (ws) => {
     console.log('connection')
     const writer = new WebSocketWriter(ws)
-    const conn = manager.createConnection(writer)
+    const service = new ObjectLinkService(registry, writer)
 
 ws.on('message', (data) => {
-        console.log('message', data.toString())
-        const msg = JSON.parse(data.toString())
-        conn.handleMessage(msg)
+        service.handleMessage(data.toString())
     })
 })

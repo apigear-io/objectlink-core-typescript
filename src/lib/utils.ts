@@ -3,5 +3,5 @@ export interface IMessageWriter {
 }
 
 export interface IMessageHandler {
-    handleMessage(msg: any): void
+    handleMessage(data: string): void
 }
