@@ -1,13 +1,15 @@
-import { IClientProtocolListener, IServiceProtocolListener } from './listener';
+import { IProtocolListener } from './listener';
 import { MessageFormat, MsgType } from './types';
 import { IMessageWriter, IMessageHandler } from './utils';
 
-abstract class AbstractProtocol implements IMessageHandler {
+export class Protocol {
     w: IMessageWriter    
     f: MessageFormat
-    constructor(w: IMessageWriter, f: MessageFormat) {
+    l: IProtocolListener
+    constructor(l: IProtocolListener, w: IMessageWriter, f: MessageFormat) {
         this.w = w
         this.f = f
+        this.l = l
     }
 
     fromString(data: string): any {
@@ -34,15 +36,7 @@ abstract class AbstractProtocol implements IMessageHandler {
         }
         this.onMessage(msg)
     }
-    abstract onMessage(msg: any[]): void
-}
 
-export class ClientProtocol extends AbstractProtocol {
-    l: IClientProtocolListener
-    constructor(w: IMessageWriter, l: IClientProtocolListener) {
-        super(w, MessageFormat.JSON)
-        this.l = l
-    }
     onMessage(msg: any[]): void {
         const msgType = msg[0]
         switch(msgType) {
@@ -76,23 +70,6 @@ export class ClientProtocol extends AbstractProtocol {
                 this.l.handlePropertyChange(name, value)
                 break
             }
-        }
-    }
-}
-
-export class ServiceProtocol extends AbstractProtocol {
-    l: IServiceProtocolListener
-
-    constructor(w: IMessageWriter, l: IServiceProtocolListener) {
-        super(w, MessageFormat.JSON)
-        this.l = l
-    }
-
-    onMessage(msg: any[]): void {
-        console.log('004', msg)
-        const msgType = msg[0]
-        console.log('004.1', msgType)
-        switch(msgType) {
             case MsgType.LINK: {
                 const [_, name ] = msg
                 console.log('link', name)

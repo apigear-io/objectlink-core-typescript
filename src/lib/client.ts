@@ -1,6 +1,7 @@
-import { IClientProtocolListener } from "./listener"
+import { IProtocolListener } from "./listener"
 import { Messages } from "./messages"
-import { ClientProtocol } from "./protocol"
+import { Protocol } from "./protocol"
+import { MessageFormat } from "./types"
 import { IMessageHandler, IMessageWriter } from "./utils"
 
 export interface IClientObjectHandler {
@@ -33,15 +34,15 @@ class ClientObjectRegistry  {
     }
 }
 
-export class ObjectLinkClient implements IClientProtocolListener, IMessageHandler {
+export class ObjectLinkClient implements IProtocolListener, IMessageHandler {
     requestId = 0
     replyHandler: Record<number, ReplyHandler> = {}
     registry: ClientObjectRegistry
-    protocol: ClientProtocol
+    protocol: Protocol
     constructor(writer: IMessageWriter) {
         console.log('client.constructor')
         this.registry = new ClientObjectRegistry()
-        this.protocol = new ClientProtocol(writer, this)
+        this.protocol = new Protocol(this, writer, MessageFormat.JSON)
     }
     addObject(name: string, handler: IClientObjectHandler) {
         this.registry.addObject(name, handler)
@@ -122,7 +123,18 @@ export class ObjectLinkClient implements IClientProtocolListener, IMessageHandle
     handleError(msgType: number, id: number, error: string) {
         console.log('handle error', msgType, id, error)
     }
-
+    handleLink(name: string) {
+        console.error('not implemented')
+    }
+    handleUnlink(name: string) {
+        console.error('not implemented')
+    }
+    handleInvoke(id: number, name: string, args: any) {
+        console.error('not implemented')
+    }
+    handleSetProperty(name: string, value: any) {
+        console.error('not implemented')
+    }
     write(msg: any) {
         this.protocol?.writeMessage(msg)
     }

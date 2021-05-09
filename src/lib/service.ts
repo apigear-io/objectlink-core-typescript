@@ -1,7 +1,7 @@
-import { IServiceProtocolListener } from "./listener"
+import { IProtocolListener } from "./listener"
 import { Messages } from "./messages"
-import { ServiceProtocol } from "./protocol"
-import { MsgType } from "./types"
+import { Protocol } from "./protocol"
+import { MessageFormat, MsgType } from "./types"
 import { IMessageHandler, IMessageWriter } from "./utils"
 
 export interface IObjectRemoteAdapter {
@@ -78,13 +78,13 @@ export class ObjectLinkRemoteRegistry implements IObjectRemoteNotifier {
     }
 }
 
-export class ObjectLinkService implements IServiceProtocolListener, IMessageHandler {
+export class ObjectLinkService implements IProtocolListener, IMessageHandler {
     registry: ObjectLinkRemoteRegistry
-    protocol: ServiceProtocol
+    protocol: Protocol
     constructor(r: ObjectLinkRemoteRegistry, w: IMessageWriter) {
         console.log('connection.constructor')
         this.registry = r
-        this.protocol = new ServiceProtocol(w, this)
+        this.protocol = new Protocol(this, w, MessageFormat.JSON)
     }    
     handleMessage(data: string): void {
         this.protocol.handleMessage(data)
@@ -113,6 +113,21 @@ export class ObjectLinkService implements IServiceProtocolListener, IMessageHand
         if(adapter) {
             adapter.setProperty(name, value)
         }
+    }
+    handleInit(name: string, props: any) {
+        console.log('not implemented')
+    }
+    handleInvokeReply(id: number, name: string, value: any) {
+        console.log('not implemented')
+    }
+    handlePropertyChange(name: string, value: any) {
+        console.log('not implemented')
+    }
+    handleSignal(name: string, args: any) {
+        console.log('not implemented')
+    }
+    handleError(msgType: number, id: number, error: string) {
+        console.log('not implemented')
     }
 
     writeInit(name: string, props: any) {
