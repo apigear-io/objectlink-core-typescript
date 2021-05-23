@@ -1,56 +1,55 @@
 import WebSocket from 'ws'
-import { IObjectRemoteNotifier, IObjectRemoteAdapter, ObjectLinkRemoteRegistry } from '..'
-import { ObjectLinkService } from '../lib/service';
-import { WebSocketWriter } from './shared';
+import { IObjectSource, Name, RemoteNode, RemoteRegistry } from '../';
 
 
-
-class CounterAdapter implements IObjectRemoteAdapter {
-    notifier: IObjectRemoteNotifier | null = null
+class CounterAdapter implements IObjectSource {
+    node: RemoteNode | null = null
     count = 0
-    getObjectName(): string {
+    constructor() {
+        RemoteNode.addObjectSource(this)
+    }
+    olinkObjectName(): string {
         return 'demo.Counter'
     }
-    invoke(name: string, args: any[]): any {
-        console.log('invoke', name, args)
-        const [_, operation] = name.split('/')
-        switch(operation) {
+    olinkInvoke(name: string, args: any[]): any {
+        console.log('CounterAdapter.olinkInvoke', name, args)
+        const path = Name.pathFromName(name)
+        switch(path) {
             case 'increment':
                 this.count++
-                this.notifier?.notifyPropertyChange(name, this.count)
+                this.node?.notifyPropertyChange(name, this.count)
         }
         this.notifyShutdown(7)
         return {v: "Hello2", x: -10}
     }
-    setProperty(name: string, value: any): void {
-        console.log('property change', name, value)
+    olinkSetProperty(name: string, value: any): void {
+        console.log('CounterAdapter.olinkSetProperty', name, value)
         const [ _, path ] = name.split('/')
         if(path === 'count' && this.count !== value) {
             this.count = value
-            this.notifier?.notifyPropertyChange(name, value)
+            this.node?.notifyPropertyChange(name, value)
         }
     }
-    collectProperties(): any {
+    olinkCollectProperties(): any {
+        console.log('CounterAdapter.olinkCollectProperties')
         const count = this.count
         return { count }
     }
-    linked(name: string, notifier: IObjectRemoteNotifier): any {
-        console.log('adapter.linked', name)
-        this.notifier = notifier
-        return this.collectProperties()
+    olinkLinked(name: string, node: RemoteNode): any {
+        console.log('CounterAdapter.olinkLinked', name)
+        this.node = node
     }    
-    unlinked() {
-        this.notifier = null
+    olinkUnlinked() {
+        console.log('CounterAdapter.olinkUnlinked')
+        this.node = null
     }
     notifyShutdown(timeout: number) {
-        const name = `${this.getObjectName()}/shutdown`
-        this.notifier?.notifySignal(name, [timeout])
+        const name = `${this.olinkObjectName()}/shutdown`
+        this.node?.notifySignal(name, [timeout])
     }
 }
 
-const registry = new ObjectLinkRemoteRegistry()
 const adapter = new CounterAdapter()
-registry.addObject(adapter)
 
 const wss = new WebSocket.Server({
     port: 8282,
@@ -58,10 +57,11 @@ const wss = new WebSocket.Server({
 
 wss.on('connection', (ws) => {
     console.log('connection')
-    const writer = new WebSocketWriter(ws)
-    const service = new ObjectLinkService(registry, writer)
-
-ws.on('message', (data) => {
-        service.handleMessage(data.toString())
+    const remote = new RemoteNode()
+    remote.onWrite((msg: string) => {
+        ws.send(msg)
+    })
+    ws.on('message', (data) => {
+        remote.handleMessage(data.toString())
     })
 })

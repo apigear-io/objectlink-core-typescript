@@ -1,12 +1,15 @@
-import { ObjectLinkClient, IClientObjectHandler } from './lib/client'
-import { IMessageWriter } from './lib/utils'
-import { IObjectRemoteNotifier, IObjectRemoteAdapter, ObjectLinkRemoteRegistry } from './lib/service'
+import { ClientNode, ClientRegistry, InvokeReplyArg, InvokeReplyFunc, IObjectSink } from './lib/clientnode';
+import { Name } from './lib/core/types';
+import { IObjectSource, RemoteNode, RemoteRegistry } from "./lib/remotenode";
 
 export {
-    ObjectLinkClient,
-    IClientObjectHandler,
-    IMessageWriter,
-    IObjectRemoteNotifier,
-    IObjectRemoteAdapter,
-    ObjectLinkRemoteRegistry
+    RemoteNode,
+    RemoteRegistry,
+    ClientNode,
+    ClientRegistry,
+    IObjectSource,
+    IObjectSink,
+    Name,
+    InvokeReplyFunc,
+    InvokeReplyArg,
 }

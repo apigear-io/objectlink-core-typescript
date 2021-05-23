@@ -12,12 +12,31 @@ In general a local object will communicate with a remote object and properties w
 * The protocol shall support all JSON (MsgPack, CBOR) types as payload
 * The protocol shall be implementable using different programming languages and technologies.
 * The protocol also designed for web sockets shall not depend on web sockets
+* TODO: expand requirements for use cases
+
+* The protocol shall be symmetrical (client and server are the same, e.g. nodes)
+* The protocol shall be testable with client and service inside one process
+* The protocol shall be testable without a network connection
+* Many the same sink can connect from many client to one server and share the same source
+* A sink can only be available on one client
+* The protocol shall fully support ObjectAPIs API spectrum (synced properties, async operations, broadcasted signals)
+* A client only subscribes to named interfaces (as objects)
+* A server only exposes named interfaces
+* To link a sink to a source the source needs to be on a known server and be registered
+* A client links a sink using the source name (e.g. `${module}.${interface}`)
+* Always fully qualified names are transmitted (e.g. `${module}.${interface}` for interface and `${module}.${interface}/${path}`) for properties, operations and signals.
+* The same sinks on all connections are notified about property changes and server side signals.
+* Operation results are only written back to the same connection, resulting changes (e.g. property changes, signals) are synced to all the same sinks connected.
+
+
 
 ## Use Case
 
 * Invoke a remote operation from a client
 * Sync properties between different clients which link the same object
 * Receive signals by all clients which link the same object
+
+### Remote Operation Invocation
 
 ## Message Types
 
@@ -26,7 +45,8 @@ In general a local object will communicate with a remote object and properties w
 	* <-- `INIT` - after link message and sends all collected properties back to client
 	* --> `UNLINK` - unlinks a socket from an object
 * Properties
-	* <--> `PROPERTY_CHANGE` - sends a property change to the remote object, as also propages the property change back to all linked clients
+  * --> `SET_PROPERTY`  - send a property change to service
+	* <-- `PROPERTY_CHANGE` - sends a property change to all linked clients
 * Operations
 	* --> `INVOKE` - invoke a remote operation
 	* <-- `INVOKE_REPLY` - reply of an invoke
@@ -162,7 +182,7 @@ interfaces:
 ```js
 // org.demos.js
 class Echo {
-  notifyShutdown(timout: number)	
+  notifyShutdown(timeout: number)	
 }
 const echo = new Echo()
 echo.notifyShutdown(10)
