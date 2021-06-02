@@ -142,13 +142,13 @@ export class RemoteNode extends BaseNode {
             console.log("no source registered for: " + name)
         }
     }
-    notifyPropertyChange(name: string, value: any) {
-        for(const node of this.registry().getRemoteNodes(name)) {
+    static notifyPropertyChange(name: string, value: any) {
+        for(const node of RemoteRegistry.get().getRemoteNodes(name)) {
             node.emitWrite(Protocol.propertyChangeMessage(name, value))
         }
     }
-    notifySignal(name: string, args: any) {
-        for(const node of this.registry().getRemoteNodes(name)) {
+    static notifySignal(name: string, args: any) {
+        for(const node of RemoteRegistry.get().getRemoteNodes(name)) {
             node.emitWrite(Protocol.signalMessage(name, args))
         }
     }

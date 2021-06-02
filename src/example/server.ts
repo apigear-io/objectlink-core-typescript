@@ -3,10 +3,22 @@ import { IObjectSource, Name, RemoteNode, RemoteRegistry } from '../';
 import { Server } from '../lib/net/server';
 
 
+class CounterImpl {
+    count = 0;
+    increment() {
+        this.count++
+        RemoteNode.notifyPropertyChange('demo.Counter/count', this.count)
+    }
+    notifyShutdown(timeout: number) {
+        RemoteNode.notifySignal('demo.Counter/shutdown', [timeout])
+    }
+}
 class CounterAdapter implements IObjectSource {
     node: RemoteNode | null = null
     count = 0
-    constructor() {
+    impl: CounterImpl
+    constructor(impl: CounterImpl) {
+        this.impl = impl
         RemoteNode.addObjectSource(this)
     }
     olinkObjectName(): string {
@@ -17,23 +29,21 @@ class CounterAdapter implements IObjectSource {
         const path = Name.pathFromName(name)
         switch(path) {
             case 'increment':
-                this.count++
-                this.node?.notifyPropertyChange(name, this.count)
+                this.impl.increment()
+                RemoteNode.notifyPropertyChange(name, this.count)
         }
-        this.notifyShutdown(7)
-        return {v: "Hello2", x: -10}
     }
     olinkSetProperty(name: string, value: any): void {
         console.log('CounterAdapter.olinkSetProperty', name, value)
-        const [ _, path ] = name.split('/')
-        if(path === 'count' && this.count !== value) {
-            this.count = value
-            this.node?.notifyPropertyChange(name, value)
+        const path = Name.pathFromName(name)
+        if(path === 'count' && this.impl.count !== value) {
+            this.impl.count = value
+            RemoteNode.notifyPropertyChange(name, value)
         }
     }
     olinkCollectProperties(): any {
         console.log('CounterAdapter.olinkCollectProperties')
-        const count = this.count
+        const count = this.impl.count
         return { count }
     }
     olinkLinked(name: string, node: RemoteNode): any {
@@ -44,13 +54,9 @@ class CounterAdapter implements IObjectSource {
         console.log('CounterAdapter.olinkUnlinked')
         this.node = null
     }
-    notifyShutdown(timeout: number) {
-        const name = `${this.olinkObjectName()}/shutdown`
-        this.node?.notifySignal(name, [timeout])
-    }
 }
-
-const adapter = new CounterAdapter()
+const impl = new CounterImpl()
+const adapter = new CounterAdapter(impl)
 
 
 const server = new Server()

@@ -18,11 +18,11 @@ export class MockSource implements IObjectSource {
     }
 
     setProperty(name: string, value: any) {
-        this.node?.notifyPropertyChange(name, value)
+        RemoteNode.notifyPropertyChange(name, value)
     }
 
     notifySignal(name: string, args: any[]) {
-        this.node?.notifySignal(name, args)
+        RemoteNode.notifySignal(name, args)
     }
 
     olinkObjectName(): string {
@@ -37,7 +37,7 @@ export class MockSource implements IObjectSource {
         this.events.push({ type: 'setProperty', name, value })
         if(this.properties[path] !== value) {
             this.properties[name] = value
-            this.node?.notifyPropertyChange(name, value)
+            RemoteNode.notifyPropertyChange(name, value)
         }
     }
     olinkLinked(name: string, node: RemoteNode): void {

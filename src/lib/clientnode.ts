@@ -100,6 +100,18 @@ export class ClientNode extends BaseNode {
         this.requestId++
         return this.requestId
     }
+    invokeRemoteAsync(name: string, args: any): Promise<any> {
+        return new Promise((resolve, reject) => {
+            let wait = setTimeout(() => {
+                clearTimeout(wait);
+                reject(new Error('timeout'))
+              }, 1000)
+            this.invokeRemote(name, args, (arg: InvokeReplyArg) => {
+                clearTimeout(wait)
+                resolve(arg.value)
+            })
+        })
+    }
     invokeRemote(name: string, args: any, func: InvokeReplyFunc|null) {
         console.log("ClientNode.invokeRemote: ", name, args)
         const requestId = this.nextRequestId()        
