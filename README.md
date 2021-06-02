@@ -1,4 +1,4 @@
-# ObjectLink Protocol
+# ObjectLink Core Protocol for Typescript
 
 The ObjectLink protocol links an object to a remote object.
 

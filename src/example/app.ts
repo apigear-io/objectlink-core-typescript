@@ -3,7 +3,7 @@ import WebSocket from 'ws'
 import { ClientNode, ClientRegistry, IObjectSink, Name, RemoteRegistry } from '..';
 import { Client, createClientOptions } from '../lib/net/client';
 
-class BaseClient extends EventEmitter implements IObjectSink  {
+class ObjectSink extends EventEmitter implements IObjectSink  {
     [k: string]: any
     _objectName: string
     _node: ClientNode | null
@@ -54,7 +54,7 @@ class BaseClient extends EventEmitter implements IObjectSink  {
     }
 }
 
-class Counter extends BaseClient {
+class Counter extends ObjectSink {
     _count = 0
     constructor() {
         super('demo.Counter')
@@ -81,4 +81,7 @@ const client = new Client(node, createClientOptions())
 const counter = new Counter()
 node.linkRemote("demo.Counter")
 counter.increment()
+counter.on('countChanged', (value) => {
+    console.log('count', value)
+})
 client.open('ws://127.0.0.1:8282')

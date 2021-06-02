@@ -1,6 +1,5 @@
 import { EventEmitter } from "eventemitter3"
 import WebSocket from 'ws'
-import { IncomingMessage} from 'http'
 import { ClientNode } from "../clientnode"
 
 interface IWebSocket extends WebSocket {

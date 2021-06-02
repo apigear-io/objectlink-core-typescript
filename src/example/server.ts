@@ -1,63 +1,79 @@
-import { IncomingMessage} from 'http';
-import { IObjectSource, Name, RemoteNode, RemoteRegistry } from '../';
+import { IObjectSource, Name, RemoteNode } from '../';
 import { Server } from '../lib/net/server';
 
 
-class CounterImpl {
+class BaseSink {
+    [k: string]: any
+    _objectName: string
+    _propNames: string[]
+    constructor(objectName: string, propNames: string[]) {
+        this._objectName = objectName
+        this._propNames = propNames
+    }
+    _notifyPropertyChange(path: string, value: any) {
+        RemoteNode.notifyPropertyChange(`{this._objectName}/{path}`, value)
+    }
+    _notifySignal(path: string, args: any[]) {
+        RemoteNode.notifySignal(`{this._objectName}/{path}`, args)
+    }
+    _collectProperties() {
+        const props: Record<string, any> = {}
+        this._propNames.forEach(element => {
+            props[element] = this[element]
+        });
+        return props
+    }
+
+}
+
+class CounterImpl extends BaseSink {
     count = 0;
+    constructor() {
+        super('demo.Counter', ['count'])
+    }
     increment() {
         this.count++
-        RemoteNode.notifyPropertyChange('demo.Counter/count', this.count)
+        this._notifyPropertyChange('count', this.count)
     }
-    notifyShutdown(timeout: number) {
-        RemoteNode.notifySignal('demo.Counter/shutdown', [timeout])
+    fireShutdown(timeout: number) {
+        this._notifySignal('shutdown', [timeout])
     }
 }
-class CounterAdapter implements IObjectSource {
-    node: RemoteNode | null = null
-    count = 0
-    impl: CounterImpl
-    constructor(impl: CounterImpl) {
+
+class ObjectSource implements IObjectSource {
+    impl: BaseSink
+    constructor(impl: BaseSink) {
         this.impl = impl
-        RemoteNode.addObjectSource(this)
     }
+
     olinkObjectName(): string {
-        return 'demo.Counter'
+        return this.impl._objectName
+    }
+
+    olinkLinked(name: string, node: RemoteNode): any {
+    }    
+    olinkUnlinked() {
     }
     olinkInvoke(name: string, args: any[]): any {
-        console.log('CounterAdapter.olinkInvoke', name, args)
+        console.log('invoke ', name)
         const path = Name.pathFromName(name)
-        switch(path) {
-            case 'increment':
-                this.impl.increment()
-                RemoteNode.notifyPropertyChange(name, this.count)
-        }
+        this.impl[path](...args)
     }
     olinkSetProperty(name: string, value: any): void {
-        console.log('CounterAdapter.olinkSetProperty', name, value)
         const path = Name.pathFromName(name)
-        if(path === 'count' && this.impl.count !== value) {
-            this.impl.count = value
+        if(this.impl[path] !== value) {
+            this.impl[path] = value
             RemoteNode.notifyPropertyChange(name, value)
         }
     }
     olinkCollectProperties(): any {
-        console.log('CounterAdapter.olinkCollectProperties')
-        const count = this.impl.count
-        return { count }
+        return this.impl._collectProperties()
     }
-    olinkLinked(name: string, node: RemoteNode): any {
-        console.log('CounterAdapter.olinkLinked', name)
-        this.node = node
-    }    
-    olinkUnlinked() {
-        console.log('CounterAdapter.olinkUnlinked')
-        this.node = null
-    }
+
 }
 const impl = new CounterImpl()
-const adapter = new CounterAdapter(impl)
-
+const source = new ObjectSource(impl)
+RemoteNode.addObjectSource(source)
 
 const server = new Server()
 server.listen({ port: 8282 })
