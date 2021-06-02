@@ -1,5 +1,6 @@
 import WebSocket from 'ws'
 import { ClientNode, ClientRegistry, IObjectSink, Name, RemoteRegistry } from '..';
+import { Client, createClientOptions } from '../lib/net/client';
 
 
 class Counter implements IObjectSink {
@@ -39,27 +40,12 @@ class Counter implements IObjectSink {
     }
 }
 
-const client = new ClientNode()
+const node = new ClientNode()
+node.linkNode('demo.Counter')
+const client = new Client(node, createClientOptions())
 // link node to sink
 // ensure addObjectSink returns a node
-client.linkNode('demo.Counter')
 const counter = new Counter()
-
-function start() {
-    const ws = new WebSocket('ws://127.0.0.1:8282', {});
-    client.onWrite((msg: string) => {
-        ws.send(msg)
-    })
-    ws.on('open',async  () => {
-        client.linkRemote("demo.Counter")
-        counter.increment()
-    })
-
-
-    ws.on('message', (data) => {
-        console.log('data', data)
-        client.handleMessage(data.toString())
-    })
-}
-
-setTimeout(start, 500)
+node.linkRemote("demo.Counter")
+counter.increment()
+client.open('ws://127.0.0.1:8282')

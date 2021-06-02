@@ -30,7 +30,7 @@ function reset() {
 test('client.link', () => {
     client.detach()
     expect(client.registry().getClientNode(name)).toBeNull()
-    client.linkRemote('demo.Calc')
+    client.linkRemote(name)
     expect(client.registry().getClientNode(name)).toBe(client)
     expect(sink.events).toHaveLength(1)
     expect(sink.events[0]).toEqual(expect.objectContaining({type: 'init', name }))
@@ -38,7 +38,7 @@ test('client.link', () => {
 
 test('client.setProperty', () => {
     reset()
-    client.linkRemote('demo.Calc')
+    client.linkRemote(name)
     expect(sink.events).toHaveLength(1)
     client.setRemoteProperty(propName, propValue)
     expect(sink.events).toHaveLength(2)
@@ -47,7 +47,7 @@ test('client.setProperty', () => {
 
 test('client.invoke', () => {
     reset()
-    client.linkRemote('demo.Calc')
+    client.linkRemote(name)
     expect(sink.events).toHaveLength(1)
     sink.invoke(invokeName, invokeArgs)
     expect(sink.events).toHaveLength(2)
@@ -57,7 +57,7 @@ test('client.invoke', () => {
 
 test('remote.signal', () => {
     reset()
-    client.linkRemote('demo.Calc')
+    client.linkRemote(name)
     expect(sink.events).toHaveLength(1)
     source.notifySignal(sigName, sigArgs)
     expect(sink.events).toHaveLength(2)
@@ -66,7 +66,7 @@ test('remote.signal', () => {
 
 test('remote.setProperty', () => {
     reset()
-    client.linkRemote('demo.Calc')
+    client.linkRemote(name)
     expect(sink.events).toHaveLength(1)
     source.setProperty(propName, propValue)
     expect(sink.events).toHaveLength(2)

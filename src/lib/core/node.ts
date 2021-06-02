@@ -18,7 +18,7 @@ export class BaseNode extends Base implements IProtocolListener, IMessageHandler
         if(this.writeFunc) {
             this.writeFunc(data)
         } else {
-            console.log("write not set on protocol")
+            console.log("write not set on protocol", msg)
         }
     }
     handleMessage(data: string): void {

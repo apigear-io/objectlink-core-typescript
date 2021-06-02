@@ -1,5 +1,6 @@
-import WebSocket from 'ws'
+import { IncomingMessage} from 'http';
 import { IObjectSource, Name, RemoteNode, RemoteRegistry } from '../';
+import { Server } from '../lib/net/server';
 
 
 class CounterAdapter implements IObjectSource {
@@ -51,17 +52,7 @@ class CounterAdapter implements IObjectSource {
 
 const adapter = new CounterAdapter()
 
-const wss = new WebSocket.Server({
-    port: 8282,
-})
 
-wss.on('connection', (ws) => {
-    console.log('connection')
-    const remote = new RemoteNode()
-    remote.onWrite((msg: string) => {
-        ws.send(msg)
-    })
-    ws.on('message', (data) => {
-        remote.handleMessage(data.toString())
-    })
-})
+const server = new Server()
+server.listen({ port: 8282 })
+

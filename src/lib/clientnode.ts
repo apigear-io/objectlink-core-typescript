@@ -48,82 +48,40 @@ export class ClientRegistry extends Base {
         }
     }
     linkClientNode(name: string, node: ClientNode) {
-        const resource = Name.resourceFromName(name)
-        this.initEntry(name)
-        if(!this.entries[resource].node) {
-            this.entries[resource].node = node
-        } else {
-            console.log("link node failed: sink has already a node: ", resource)
-        }
+        this.entry(name).node = node
     }
     unlinkClientNode(name: string, node: ClientNode) {
-        const resource = Name.resourceFromName(name)
-        if(this.hasEntry(resource)) {
-            if(this.entries[resource].node === node) {
-                this.entries[resource].node = null
-            } else {
-                console.log("unlink node failed, not the same node")
-            }
-        }
+        this.entry(name).node = null
     }
     addObjectSink(sink: IObjectSink): ClientNode | null {
-        const resource = Name.resourceFromName(sink.olinkObjectName())
-        this.initEntry(resource)
-        console.log("link sink: ", resource)
-        if(!this.entries[resource].sink) {
-            this.entries[resource].sink = sink
-        } else {
-            console.log("add object sink failed: sink already added: ", resource);
-        }
-        return this.entries[resource].node
+        const name = sink.olinkObjectName()
+        const e = this.entry(name)
+        e.sink = sink
+        return e.node
     }
     removeObjectSink(sink: IObjectSink) {
-        const resource = Name.resourceFromName(sink.olinkObjectName())
-        if(this.entries[resource].sink) {
-            delete this.entries[resource]
-        } else {
-            console.log("remove object sink failed: no sink to remove", resource)
-        }
+        const name = sink.olinkObjectName()
+        this.removeEntry(name)
     }
     getObjectSink(name: string): IObjectSink | null {
-        const resource = Name.resourceFromName(name)
-        if(this.entries[resource]) {
-            const sink = this.entries[resource].sink
-            if(!sink) {
-                console.log("no sink attached: ", resource)
-            }
-            return sink
-        } else {
-            console.log("no resource: ", resource)
-        }
-        return null
+        return this.entry(name).sink
     }
     getClientNode(name: string): ClientNode | null {
-        const resource = Name.resourceFromName(name)
-        if(this.entries[resource]) {
-            const node = this.entries[resource].node
-            if(!node) {
-                console.log("no node attached: ", resource)
-            }
-            return node
-        } else {
-            console.log("no resource: ", resource)
-        }
-        return null
+        return this.entry(name).node
     }
     entry(name: string): SinkToClientEntry {
-        const resource = Name.resourceFromName(name)
-        return this.entries[resource]
-    }
-    hasEntry(name: string): boolean {
-        const resource = Name.resourceFromName(name)
-        return this.entries[resource] !== undefined
-    }
-    initEntry(name: string) {
         const resource = Name.resourceFromName(name)
         if(!this.entries[resource]) {
             this.entries[resource] = { node: null, sink: null }
         }
+        return this.entries[resource]
+    }
+    removeEntry(name: string): void {
+        const resource = Name.resourceFromName(name)
+        if(this.entries[resource]) {
+            delete this.entries[resource]
+        }
+
     }
 }
 

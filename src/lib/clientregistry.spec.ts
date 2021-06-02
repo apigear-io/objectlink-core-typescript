@@ -38,7 +38,7 @@ test('empty registry', () => {
 
 test('add object sink', () => {
     ClientNode.addObjectSink(sink)
-    expect(r.getObjectSink(name)).toBe(sink)
+    expect(r.getObjectSink(name)).toEqual(sink)
 })
 
 
@@ -49,7 +49,7 @@ test('remove object sink', () => {
 
 test('link node to sink', () => {
     client.linkNode(name)
-    expect(r.getClientNode(name)).toBe(client)
+    expect(r.getClientNode(name)).toEqual(client)
 })
 
 test('unlink node from sink', () => {
@@ -67,13 +67,13 @@ test('link 2nd client to object', () => {
     expect(r.getClientNode(name)).toBe(client)
     client2.linkNode(name)
     // you can not re-link a client
-    expect(r.getClientNode(name)).toBe(client)
+    expect(r.getClientNode(name)).toEqual(client)
     // unlink client
     client.unlinkNode(name)
     expect(r.getClientNode(name)).toBeNull()
     // relink with client2
     client2.linkNode(name)
-    expect(r.getClientNode(name)).toBe(client2)
+    expect(r.getClientNode(name)).toEqual(client2)
 })
 
 

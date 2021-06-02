@@ -12,7 +12,7 @@ export interface IObjectSource {
 
 
 interface SourceToNodeEntry {
-    source: IObjectSource,
+    source: IObjectSource | null,
     nodes: Set<RemoteNode>
 }
 
@@ -29,45 +29,20 @@ export class RemoteRegistry extends Base {
         return RemoteRegistry.instance
     }
     addObjectSource(source: IObjectSource): void {        
-        const resource = Name.resourceFromName(source.olinkObjectName())
-        console.log("RemoteRegistry.addObjectSource: " + resource)
-        if(!this.entries[resource]) {
-            this.entries[resource] = { source, nodes: new Set() }
-        } else {
-            console.log("a source already added: " + resource)
-        }
+        const name = source.olinkObjectName()
+        console.log("RemoteRegistry.addObjectSource: " + name)
+        this.entry(name).source = source
     }
     removeObjectSource(source: IObjectSource): void {
-        const resource = Name.resourceFromName(source.olinkObjectName())
-        console.log("RemoteRegistry.removeObjectSource: " + resource)
-        if(this.entries[resource]) {
-            delete this.entries[resource]
-        } else {
-            console.log("remove object source failed, no source exists: " + resource)
-        }
+        const name = source.olinkObjectName()
+        console.log("RemoteRegistry.removeObjectSource: " + name)
+        this.removeEntry(name)
     }
     getObjectSource(name: string): IObjectSource | null {
-        const resource = Name.resourceFromName(name)
-        if(this.entries[resource]) {
-            const source = this.entries[resource].source
-            if(!source) {
-                console.log("no source at: " + resource)
-            }
-            return source
-        } else {
-            console.log("no source registered: " + resource)
-        }
-        return null
+        return this.entry(name).source
     }
     getRemoteNodes(name: string): Set<RemoteNode> {
-        const resource = Name.resourceFromName(name)
-        if(this.entries[resource]) {
-            const nodes = this.entries[resource].nodes
-            return nodes
-        } else {
-            console.log("no source registered: " + resource)
-        }
-        return new Set<RemoteNode>()
+        return this.entry(name).nodes
     }
     attachRemoteNode(node: RemoteNode): void {
         console.log("RemoteRegistry.attachRemoteNode")
@@ -81,21 +56,24 @@ export class RemoteRegistry extends Base {
         }
     }
     linkRemoteNode(name: string, node: RemoteNode): void {
-        const resource = Name.resourceFromName(name)
         console.log("RemoteRegistry.linkRemoteNode: " + name)
-        if(this.entries[resource]) {
-            this.entries[resource].nodes.add(node)
-        } else {
-            console.log("no source registered: " + resource)
-        }
+        this.entry(name).nodes.add(node)
     }
     unlinkRemoteNode(name: string, node: RemoteNode): void {
+        console.log("RemoteRegistry.unlinkRemoteNode: " + name)
+        this.entry(name).nodes.delete(node)
+    }
+    entry(name: string): SourceToNodeEntry {
         const resource = Name.resourceFromName(name)
-        console.log("RemoteRegistry.linkRemoteNode: " + name)
+        if(!this.entries[resource]) {
+            this.entries[resource] = { source: null, nodes: new Set() }
+        }
+        return this.entries[resource]
+    }
+    removeEntry(name: string): void {
+        const resource = Name.resourceFromName(name)
         if(this.entries[resource]) {
-            this.entries[resource].nodes.delete(node)
-        } else {
-            console.log("no source registered: " + resource)
+            delete this.entries[resource]
         }
     }
 
